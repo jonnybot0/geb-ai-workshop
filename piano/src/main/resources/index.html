@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTMX Interactive Piano</title>
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            color: #333;
+        }
+        .instructions {
+            margin: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            max-width: 800px;
+            text-align: center;
+        }
+        .instructions p {
+            margin: 5px 0;
+        }
+        .instructions kbd {
+            display: inline-block;
+            padding: 2px 6px;
+            font-size: 0.9em;
+            background-color: #eee;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            box-shadow: 1px 1px 1px #999;
+        }
+        #staff-container {
+            width: 90%;
+            max-width: 900px;
+            height: 250px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            margin-bottom: 20px;
+            padding: 10px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        #staff-svg {
+            height: 230px;
+            min-width: 100%; /* Ensure it starts at full width */
+        }
+        .piano {
+            display: flex;
+            justify-content: center;
+            padding: 0;
+            margin: 0;
+        }
+        .key {
+            border: 1px solid #000;
+            box-sizing: border-box;
+            cursor: pointer;
+            position: relative;
+        }
+        .key .key-label {
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: #555;
+            pointer-events: none;
+        }
+        .white {
+            width: 50px;
+            height: 200px;
+            background-color: white;
+            border-top: none;
+        }
+        .white.active {
+            background-color: #00bcd4; /* Cyan */
+        }
+        .black {
+            width: 30px;
+            height: 120px;
+            background-color: black;
+            margin-left: -15px;
+            margin-right: -15px;
+            z-index: 2;
+        }
+        .black.active {
+            background-color: #00bcd4; /* Cyan */
+        }
+        .black .key-label {
+             color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="instructions">
+        <h2>Interactive Piano</h2>
+        <p>Click the piano keys or use your computer keyboard to play notes and see them appear on the staff.</p>
+        <p><b>White Keys:</b> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> <kbd>F</kbd> <kbd>G</kbd> <kbd>H</kbd> <kbd>J</kbd> <kbd>K</kbd> <kbd>L</kbd> <kbd>;</kbd> <kbd>'</kbd> &nbsp; | &nbsp; <b>Black Keys:</b> <kbd>W</kbd> <kbd>E</kbd> <kbd>T</kbd> <kbd>Y</kbd> <kbd>U</kbd> <kbd>O</kbd> <kbd>P</kbd></p>
+        <p>Hold <kbd>Shift</kbd> for higher octaves or <kbd>Ctrl</kbd> for lower octaves.</p>
+    </div>
+
+    <div id="staff-container">
+        <svg id="staff-svg" xmlns="http://www.w3.org/2000/svg">
+            </svg>
+    </div>
+
+    <div class="piano" id="piano-container">
+        </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const pianoContainer = document.getElementById('piano-container');
+            const staffContainer = document.getElementById('staff-container');
+            const svg = document.getElementById('staff-svg');
+            const SVG_NS = "http://www.w3.org/2000/svg";
+
+            const notesConfig = [
+                { note: 'C', octave: 2, keyboard: '', type: 'white' },
+                { note: 'C#', octave: 2, keyboard: '', type: 'black' },
+                { note: 'D', octave: 2, keyboard: '', type: 'white' },
+                { note: 'D#', octave: 2, keyboard: '', type: 'black' },
+                { note: 'E', octave: 2, keyboard: '', type: 'white' },
+                { note: 'F', octave: 2, keyboard: '', type: 'white' },
+                { note: 'F#', octave: 2, keyboard: '', type: 'black' },
+                { note: 'G', octave: 2, keyboard: '', type: 'white' },
+                { note: 'G#', octave: 2, keyboard: '', type: 'black' },
+                { note: 'A', octave: 2, keyboard: '', type: 'white' },
+                { note: 'A#', octave: 2, keyboard: '', type: 'black' },
+                { note: 'B', octave: 2, keyboard: '', type: 'white' },
+                { note: 'C', octave: 3, keyboard: '', type: 'white' },
+                { note: 'C#', octave: 3, keyboard: '', type: 'black' },
+                { note: 'D', octave: 3, keyboard: '', type: 'white' },
+                { note: 'D#', octave: 3, keyboard: '', type: 'black' },
+                { note: 'E', octave: 3, keyboard: '', type: 'white' },
+                { note: 'F', octave: 3, keyboard: '', type: 'white' },
+                { note: 'F#', octave: 3, keyboard: '', type: 'black' },
+                { note: 'G', octave: 3, keyboard: '', type: 'white' },
+                { note: 'G#', octave: 3, keyboard: '', type: 'black' },
+                { note: 'A', octave: 3, keyboard: 'a', type: 'white' }, // Home Row Start (Lower)
+                { note: 'A#', octave: 3, keyboard: 'w', type: 'black' },
+                { note: 'B', octave: 3, keyboard: 's', type: 'white' },
+                { note: 'C', octave: 4, keyboard: 'd', type: 'white' }, // Middle C
+                { note: 'C#', octave: 4, keyboard: 'e', type: 'black' },
+                { note: 'D', octave: 4, keyboard: 'f', type: 'white' },
+                { note: 'D#', octave: 4, keyboard: 't', type: 'black' },
+                { note: 'E', octave: 4, keyboard: 'g', type: 'white' },
+                { note: 'F', octave: 4, keyboard: 'h', type: 'white' },
+                { note: 'F#', octave: 4, keyboard: 'y', type: 'black' },
+                { note: 'G', octave: 4, keyboard: 'j', type: 'white' },
+                { note: 'G#', octave: 4, keyboard: 'u', type: 'black' },
+                { note: 'A', octave: 4, keyboard: 'k', type: 'white' },
+                { note: 'A#', octave: 4, keyboard: 'o', type: 'black' },
+                { note: 'B', octave: 4, keyboard: 'l', type: 'white' },
+                { note: 'C', octave: 5, keyboard: ';', type: 'white' },
+                { note: 'C#', octave: 5, keyboard: 'p', type: 'black' },
+                { note: 'D', octave: 5, keyboard: "'", type: 'white' }, // Home Row End (Lower)
+                { note: 'D#', octave: 5, keyboard: '', type: 'black' },
+                { note: 'E', octave: 5, keyboard: '', type: 'white' },
+                { note: 'F', octave: 5, keyboard: '', type: 'white' },
+                { note: 'F#', octave: 5, keyboard: '', type: 'black' },
+                { note: 'G', octave: 5, keyboard: '', type: 'white' },
+                { note: 'G#', octave: 5, keyboard: '', type: 'black' },
+                { note: 'A', octave: 5, keyboard: '', type: 'white' },
+                { note: 'A#', octave: 5, keyboard: '', type: 'black' },
+                { note: 'B', octave: 5, keyboard: '', type: 'white' },
+                { note: 'C', octave: 6, keyboard: '', type: 'white' },
+            ];
+
+            // --- Note Positioning on Staff ---
+            // Y positions for notes from C4 (Middle C) up to B5
+            const notePositions = {
+                'C4': 105, 'D4': 99, 'E4': 93, 'F4': 87, 'G4': 81, 'A4': 75, 'B4': 69,
+                'C5': 63, 'D5': 57, 'E5': 51, 'F5': 45, 'G5': 39, 'A5': 33, 'B5': 27,
+                'C6': 21,
+                // Bass Clef Notes
+                'A2': 195, 'B2': 189, 'C3': 183, 'D3': 177, 'E3': 171, 'F3': 165, 'G3': 159,
+                'A3': 153, 'B3': 147
+            };
+
+            // --- Web Audio API Setup ---
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const activeOscillators = {};
+
+            function getFrequency(note, octave) {
+                const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+                const keyNumber = notes.indexOf(note);
+                const i = keyNumber + (octave - 4) * 12;
+                return 440 * Math.pow(2, (i - 9) / 12);
+            }
+
+            function playNote(note, octave) {
+                const freq = getFrequency(note, octave);
+                if (!freq || activeOscillators[`${note}${octave}`]) return;
+
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
+
+                gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 1);
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                oscillator.start();
+                activeOscillators[`${note}${octave}`] = oscillator;
+
+                setTimeout(() => {
+                    stopNote(note, octave);
+                }, 500); // Note duration
+            }
+
+            function stopNote(note, octave) {
+                const id = `${note}${octave}`;
+                if (activeOscillators[id]) {
+                    activeOscillators[id].stop();
+                    delete activeOscillators[id];
+                }
+            }
+            
+            // --- Note Drawing Logic ---
+            let currentX = 100; // Starting position for notes
+            const noteSpacing = 40;
+            const staffWidth = 4000; // Make SVG very wide for scrolling
+            svg.setAttribute('width', staffWidth);
+
+            let chordBuffer = [];
+            let chordTimer = null;
+
+            function drawNoteOnStaff(note, octave) {
+                const noteId = `${note.replace('#', 's')}${octave}`;
+                const yPos = notePositions[noteId.replace('s', '')];
+                if (yPos === undefined) return; // Note is off the visible staff
+
+                const isSharp = note.includes('#');
+                const noteGroup = document.createElementNS(SVG_NS, 'g');
+                
+                // Add sharp symbol if needed
+                if (isSharp) {
+                    const sharp = document.createElementNS(SVG_NS, 'text');
+                    sharp.setAttribute('x', currentX - 12);
+                    sharp.setAttribute('y', yPos + 4);
+                    sharp.setAttribute('font-size', '20px');
+                    sharp.textContent = '♯';
+                    noteGroup.appendChild(sharp);
+                }
+
+                // Draw the note head
+                const noteHead = document.createElementNS(SVG_NS, 'ellipse');
+                noteHead.setAttribute('cx', currentX);
+                noteHead.setAttribute('cy', yPos);
+                noteHead.setAttribute('rx', 6);
+                noteHead.setAttribute('ry', 4.5);
+                noteHead.setAttribute('transform', `rotate(-20, ${currentX}, ${yPos})`);
+                noteGroup.appendChild(noteHead);
+                
+                // Draw the stem
+                const isUpper = yPos <= 93; // B4 line and above
+                const stem = document.createElementNS(SVG_NS, 'line');
+                const stemX = isUpper ? currentX + 5.5 : currentX - 5.5;
+                const stemY1 = yPos;
+                const stemY2 = isUpper ? yPos + 35 : yPos - 35;
+                stem.setAttribute('x1', stemX);
+                stem.setAttribute('y1', stemY1);
+                stem.setAttribute('x2', stemX);
+                stem.setAttribute('y2', stemY2);
+                stem.setAttribute('stroke', 'black');
+                stem.setAttribute('stroke-width', '1.5');
+                noteGroup.appendChild(stem);
+
+                // Add ledger lines if necessary
+                if (noteId === 'C4') { // Middle C
+                    const ledger = document.createElementNS(SVG_NS, 'line');
+                    ledger.setAttribute('x1', currentX - 12);
+                    ledger.setAttribute('y1', 105);
+                    ledger.setAttribute('x2', currentX + 12);
+                    ledger.setAttribute('y2', 105);
+                    ledger.setAttribute('stroke', 'black');
+                    ledger.setAttribute('stroke-width', '1.5');
+                    noteGroup.appendChild(ledger);
+                } else if (noteId === 'A2') {
+                    const ledger = document.createElementNS(SVG_NS, 'line');
+                    ledger.setAttribute('x1', currentX - 12);
+                    ledger.setAttribute('y1', 195);
+                    ledger.setAttribute('x2', currentX + 12);
+                    ledger.setAttribute('y2', 195);
+                    ledger.setAttribute('stroke', 'black');
+                    ledger.setAttribute('stroke-width', '1.5');
+                    noteGroup.appendChild(ledger);
+                }
+                
+                svg.appendChild(noteGroup);
+            }
+
+            function processAndDrawNotes() {
+                if (chordBuffer.length === 0) return;
+
+                if (chordBuffer.length > 1) { // It's a chord
+                    chordBuffer.forEach(({ note, octave }) => drawNoteOnStaff(note, octave));
+                } else { // It's a single note
+                    const { note, octave } = chordBuffer[0];
+                    drawNoteOnStaff(note, octave);
+                }
+
+                currentX += noteSpacing;
+                // Auto-scroll the container
+                staffContainer.scrollLeft = currentX - staffContainer.clientWidth + 100;
+                
+                chordBuffer = []; // Clear buffer after drawing
+            }
+            
+            function handlePlay(note, octave) {
+                playNote(note, octave);
+
+                // Add to chord buffer and set a timer
+                clearTimeout(chordTimer);
+                chordBuffer.push({ note, octave });
+                chordTimer = setTimeout(processAndDrawNotes, 60); // 60ms window to form a chord
+            }
+
+            // --- UI Generation ---
+            function createPiano() {
+                notesConfig.forEach(config => {
+                    const { note, octave, type, keyboard } = config;
+                    const key = document.createElement('div');
+                    key.className = `key ${type}`;
+                    key.dataset.note = note;
+                    key.dataset.octave = octave;
+
+                    const keyLabel = document.createElement('div');
+                    keyLabel.className = 'key-label';
+                    if (keyboard) {
+                        keyLabel.innerHTML = `<kbd>${keyboard.toUpperCase()}</kbd>`;
+                    }
+                    key.appendChild(keyLabel);
+                    
+                    // HTMX-like attributes for client-side action
+                    key.setAttribute('hx-trigger', 'click');
+                    key.setAttribute('hx-on-click', `
+                        const note = this.dataset.note;
+                        const octave = this.dataset.octave;
+                        handlePlay(note, parseInt(octave));
+                        this.classList.add('active');
+                        setTimeout(() => this.classList.remove('active'), 200);
+                    `);
+
+                    pianoContainer.appendChild(key);
+                });
+                // Initialize htmx on the dynamically added content
+                htmx.process(pianoContainer);
+            }
+
+            function drawStaff() {
+                // Treble Clef Lines
+                for (let i = 0; i < 5; i++) {
+                    const line = document.createElementNS(SVG_NS, 'line');
+                    line.setAttribute('x1', 0);
+                    line.setAttribute('y1', 51 + i * 12);
+                    line.setAttribute('x2', staffWidth);
+                    line.setAttribute('y2', 51 + i * 12);
+                    line.setAttribute('stroke', '#999');
+                    svg.appendChild(line);
+                }
+                // Bass Clef Lines
+                for (let i = 0; i < 5; i++) {
+                    const line = document.createElementNS(SVG_NS, 'line');
+                    line.setAttribute('x1', 0);
+                    line.setAttribute('y1', 153 + i * 12);
+                    line.setAttribute('x2', staffWidth);
+                    line.setAttribute('y2', 153 + i * 12);
+                    line.setAttribute('stroke', '#999');
+                    svg.appendChild(line);
+                }
+
+                // Treble Clef Symbol
+                const trebleClef = document.createElementNS(SVG_NS, 'text');
+                trebleClef.setAttribute('x', 10);
+                trebleClef.setAttribute('y', 85);
+                trebleClef.setAttribute('font-size', '72px');
+                trebleClef.textContent = '𝄞';
+                svg.appendChild(trebleClef);
+
+                // Bass Clef Symbol
+                const bassClef = document.createElementNS(SVG_NS, 'text');
+                bassClef.setAttribute('x', 10);
+                bassClef.setAttribute('y', 187);
+                bassClef.setAttribute('font-size', '48px');
+                bassClef.textContent = '𝄢';
+                svg.appendChild(bassClef);
+            }
+
+            // --- Keyboard Input Handling ---
+            const keyMap = {};
+            notesConfig.forEach(n => {
+                if (n.keyboard) keyMap[n.keyboard] = { note: n.note, octave: n.octave, type: n.type };
+            });
+            
+            const activeKeys = new Set();
+
+            window.addEventListener('keydown', (e) => {
+                if (e.repeat || activeKeys.has(e.key)) return;
+                
+                let key = e.key.toLowerCase();
+                let noteData = keyMap[key];
+                
+                if (noteData) {
+                    activeKeys.add(e.key);
+                    let octave = noteData.octave;
+                    if (e.shiftKey) octave++;
+                    if (e.ctrlKey) octave--;
+
+                    handlePlay(noteData.note, octave);
+
+                    // Visual feedback
+                    const keyElement = document.querySelector(`.key[data-note="${noteData.note}"][data-octave="${noteData.octave}"]`);
+                    if (keyElement) keyElement.classList.add('active');
+                }
+            });
+
+            window.addEventListener('keyup', (e) => {
+                 activeKeys.delete(e.key);
+                 let key = e.key.toLowerCase();
+                 let noteData = keyMap[key];
+
+                 if (noteData) {
+                     // Remove visual feedback from all octaves of that note
+                     document.querySelectorAll(`.key[data-note="${noteData.note}"]`).forEach(el => {
+                         el.classList.remove('active');
+                     });
+                 }
+            });
+
+            // --- Initial Setup ---
+            drawStaff();
+            createPiano();
+        });
+    </script>
+</body>
+</html>
