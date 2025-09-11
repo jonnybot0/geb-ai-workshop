@@ -15,7 +15,7 @@ environments {
             options.addArguments('--headless')
         }
         // Standard options for workshop environment
-        options.addArguments('--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu')
+        options.addArguments('--no-sandbox', '--disable-dev-shm-usage')
         driver = { new ChromeDriver(options) }
     }
 

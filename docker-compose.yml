@@ -35,13 +35,4 @@ services:
       - NODE_MAX_INSTANCES=4
       - NODE_MAX_SESSION=4
 
-  # Optional: Selenium Grid UI for monitoring
-  selenium-ui:
-    image: selenium/standalone-chrome:4.15.0-20231110
-    container_name: selenium-ui
-    ports:
-      - "7900:7900"
-    environment:
-      - VNC_NO_PASSWORD=1
-    profiles:
-      - ui
+# Note: Selenium Grid UI is available at http://localhost:4444 via the selenium-hub service
