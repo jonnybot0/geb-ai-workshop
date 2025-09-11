@@ -7,11 +7,11 @@ import geb.Page
  * This demonstrates the organized approach to test automation
  */
 class HomePage extends Page {
-    
-    static url = "/"
-    
-    static at = { 
-        title.contains("Geb") 
+
+    static url = "https://groovy.apache.org/geb"
+
+    static at = {
+        title.contains("Geb")
     }
     
     static content = {
