@@ -6,3 +6,12 @@ The application displays a piano keyboard on the screen along with a blank trebl
 Users should also be able to use the home keys on their keyboard to play the piano (from a to '). Sharp/flat notes (the black keys) should be played by the upper row of keyboard keys. They should be arranged such that the black key between two white keys corresponds to a letter on the top row of the keyboard between two notes.
 
 Since the piano has more keys than there are letters in the alphabet, users can hold shift to reach the upper registers or hold CTRL to reach the lower ones. 
+
+## Changelog
+
+### Durable notes and mouse interactivity
+That's pretty good! A few changes I'd like.
+
+If a user holds down the keys, I'd like the notes to keep playing.
+
+Also, if a user clicks on the key, I'd like the note to play as long as the user is holding the note.
