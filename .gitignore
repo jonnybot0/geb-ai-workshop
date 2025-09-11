@@ -1,0 +1,31 @@
+# Gradle
+.gradle/
+build/
+gradle-app.setting
+!gradle-wrapper.jar
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test Reports
+**/build/reports/
+**/build/test-results/
+
+# Geb Screenshots and Reports  
+**/build/reports/geb/
+
+# Temporary files
+/tmp/
+*.tmp
+*.log
+
+# Docker
+.env
