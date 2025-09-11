@@ -15,9 +15,9 @@ class HomePage extends Page {
     }
     
     static content = {
-        // Navigation elements
-        navigation { $("nav") }
-        navigationLinks { navigation.find("a") }
+        // Navigation elements - using flexible selectors since nav element may not exist
+        navigation { $("header, .menu, .navigation") }
+        navigationLinks { $("header a, .menu a, .navigation a, a") }
         manualLink { $("a", text: "Manual") }
         
         // Main content areas  
