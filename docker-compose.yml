@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   selenium-hub:
     image: selenium/hub:4.15.0-20231110
@@ -15,7 +13,6 @@ services:
 
   chrome:
     image: selenium/node-chrome:4.15.0-20231110
-    container_name: selenium-node-chrome
     shm_size: 2gb
     depends_on:
       - selenium-hub
@@ -24,11 +21,9 @@ services:
       - HUB_PORT=4444
       - NODE_MAX_INSTANCES=4
       - NODE_MAX_SESSION=4
-    scale: 2
 
   firefox:
     image: selenium/node-firefox:4.15.0-20231110
-    container_name: selenium-node-firefox
     shm_size: 2gb
     depends_on:
       - selenium-hub
@@ -37,7 +32,6 @@ services:
       - HUB_PORT=4444
       - NODE_MAX_INSTANCES=4
       - NODE_MAX_SESSION=4
-    scale: 1
 
   # Optional: Selenium Grid UI for monitoring
   selenium-ui:

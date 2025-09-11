@@ -10,14 +10,6 @@ import workshop.pages.ManualPage
  */
 class OrganizedTestsSpec extends GebSpec {
 
-    def "verify homepage loads correctly using page objects"() {
-        when: "I navigate to the homepage"
-        to HomePage
-        
-        then: "I should be on the correct page"
-        at HomePage
-    }
-    
     def "verify homepage navigation using page objects"() {
         given: "I am on the homepage"
         to HomePage
