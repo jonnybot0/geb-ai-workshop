@@ -6,7 +6,7 @@ import org.openqa.selenium.remote.RemoteWebDriver
 
 // Environment configuration for workshop participants
 environments {
-    
+
     // Development environment - use local Chrome (default)
     chrome {
         def options = new ChromeOptions()
@@ -18,7 +18,7 @@ environments {
         options.addArguments('--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu')
         driver = { new ChromeDriver(options) }
     }
-    
+
     // Firefox option for workshop participants
     firefox {
         def options = new FirefoxOptions()
@@ -27,20 +27,17 @@ environments {
         }
         driver = { new FirefoxDriver(options) }
     }
-    
+
     // Selenium Grid environment for advanced participants
     grid {
         driver = {
             new RemoteWebDriver(
-                new URL("http://localhost:4444/wd/hub"),
+                new URI("http://localhost:4444/wd/hub").toURL(),
                 new ChromeOptions()
             )
         }
     }
 }
-
-// Base URL - updated to current Geb website location
-baseUrl = "https://groovy.apache.org/geb"
 
 // Wait configuration - reasonable defaults for workshop
 waiting {

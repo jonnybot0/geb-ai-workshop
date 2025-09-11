@@ -10,47 +10,54 @@ class RoughTestsSpec extends GebSpec {
 
     def "navigate to Geb homepage and verify title"() {
         when: "I go to the Geb homepage"
-        go "/"
-        
+        go "https://groovy.apache.org/geb/"
+
         then: "I should see the correct title"
         title.contains("Geb")
     }
-    
+
     def "check navigation menu exists"() {
         when: "I go to the Geb homepage"
-        go "/"
-        
+        go "https://groovy.apache.org/geb/"
+
         then: "I should see navigation elements"
         // Updated to check for more flexible navigation patterns since nav element may not exist
         $("header a, .menu a, .navigation a, a").size() > 0
     }
-    
+
     def "navigate to manual page"() {
         when: "I go to the Geb homepage"
-        go "/"
-        
-        and: "I check for the manual link"
-        def manualLinks = $("a", text: "Manual")
-        
-        then: "I should find manual links and can simulate navigation"
-        manualLinks.size() >= 0
-        // In a real browser, we would click: manualLinks.click()
-        // For demo purposes, we'll simulate the navigation
-        true
+        go "https://groovy.apache.org/geb/"
+
+        and: "I click the manual link"
+        def manualLink = $(".manuals", text: "Manual")
+        manualLink.click()
+
+        then: "drop-down with manual links appears"
+        def manualLinks = $('#manuals-menu .ui.container')
+        manualLinks.children('.item').size() > 2
+
+        when:
+        manualLinks.children('.item').first().click()
+
+        then:
+        waitFor {
+            title.contains("The Book of Geb")
+        }
     }
-    
+
     def "check main content area exists"() {
         when: "I go to the Geb homepage"
-        go "/"
-        
+        go "https://groovy.apache.org/geb/"
+
         then: "I should see main content"
         $("main").displayed || $(".content").displayed || $("body").displayed
     }
-    
+
     def "verify footer exists"() {
         when: "I go to the Geb homepage"
-        go "/"
-        
+        go "https://groovy.apache.org/geb/"
+
         then: "I should see a footer"
         $("footer").displayed || $(".footer").displayed
     }
