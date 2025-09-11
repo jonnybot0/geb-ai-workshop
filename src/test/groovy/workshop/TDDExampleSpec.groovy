@@ -17,7 +17,7 @@ class TDDExampleSpec extends GebSpec {
 
     def "TDD Step 1: RED - Write failing test for new feature"() {
         given: "I want to test a search feature that doesn't exist yet"
-        to HomePage
+        def homePage = to HomePage
         
         when: "I try to use a search feature"
         // This demonstrates the TDD concept - write the test first
@@ -30,7 +30,7 @@ class TDDExampleSpec extends GebSpec {
     
     def "TDD Step 2: GREEN - Implement minimal feature to pass test"() {
         given: "I have implemented a basic search feature"
-        to HomePage
+        def homePage = to HomePage
         
         when: "I search for content" 
         // After implementing searchBox in HomePage, this should work
@@ -43,7 +43,7 @@ class TDDExampleSpec extends GebSpec {
     
     def "TDD Step 3: REFACTOR - Improve the implementation"() {
         given: "I have a working but basic search feature"
-        to HomePage
+        def homePage = to HomePage
         
         when: "I use the improved search functionality"
         // After refactoring, search should be more robust
@@ -56,10 +56,10 @@ class TDDExampleSpec extends GebSpec {
     
     def "TDD Example: Adding a new page object method"() {
         given: "I want to add a method to check if page is fully loaded"
-        to HomePage
+        def homePage = to HomePage
         
         when: "I call the new method"
-        boolean loaded = page.isFullyLoaded()
+        boolean loaded = homePage.isFullyLoaded()
         
         then: "Method should work correctly"
         loaded == true

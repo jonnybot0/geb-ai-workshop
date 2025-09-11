@@ -12,26 +12,26 @@ class OrganizedTestsSpec extends GebSpec {
 
     def "verify homepage navigation using page objects"() {
         given: "I am on the homepage"
-        to HomePage
+        def homePage = to HomePage
         
         expect: "Navigation should be present and functional"
-        page.hasNavigation()
+        homePage.hasNavigation()
     }
     
     def "verify main content exists using page objects"() {
         given: "I am on the homepage"
-        to HomePage
+        def homePage = to HomePage
         
         expect: "Main content should be visible"
-        page.hasMainContent()
+        homePage.hasMainContent()
     }
     
     def "navigate to manual using page objects"() {
         given: "I am on the homepage"
-        to HomePage
+        def homePage = to HomePage
         
         when: "I try to navigate to the manual"
-        // In a real browser with proper WebDriver: ManualPage manualPage = page.goToManual()
+        // In a real browser with proper WebDriver: ManualPage manualPage = homePage.goToManual()
         // For demo purposes, simulate the result
         def manualPage = to ManualPage
         
@@ -42,9 +42,9 @@ class OrganizedTestsSpec extends GebSpec {
     
     def "verify footer exists using page objects"() {
         given: "I am on the homepage"
-        to HomePage
+        def homePage = to HomePage
         
         expect: "Footer should be accessible"
-        page.footer.size() >= 0
+        homePage.footer.size() >= 0
     }
 }
