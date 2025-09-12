@@ -42,7 +42,7 @@ class RoughTestsSpec extends GebSpec {
 
         then:
         waitFor {
-            title.contains("The Book of Geb")
+            title.contains("The Book Of Geb")
         }
     }
 
@@ -51,7 +51,7 @@ class RoughTestsSpec extends GebSpec {
         go "https://groovy.apache.org/geb/"
 
         then: "I should see main content"
-        $("main").displayed || $(".content").displayed || $("body").displayed
+        $("body").displayed
     }
 
     def "verify footer exists"() {

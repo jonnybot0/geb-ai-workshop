@@ -7,7 +7,6 @@ import org.openqa.selenium.remote.RemoteWebDriver
 // Environment configuration for workshop participants
 environments {
 
-    // Development environment - use local Chrome (default)
     chrome {
         def options = new ChromeOptions()
         // Enable headless mode for CI/sandbox environments
@@ -19,7 +18,6 @@ environments {
         driver = { new ChromeDriver(options) }
     }
 
-    // Firefox option for workshop participants
     firefox {
         def options = new FirefoxOptions()
         if (System.getProperty('geb.headless') == 'true') {
@@ -28,7 +26,6 @@ environments {
         driver = { new FirefoxDriver(options) }
     }
 
-    // Selenium Grid environment for advanced participants
     grid {
         driver = {
             new RemoteWebDriver(

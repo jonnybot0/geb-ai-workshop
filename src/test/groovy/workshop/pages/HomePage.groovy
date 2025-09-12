@@ -13,30 +13,33 @@ class HomePage extends Page {
     static at = {
         title.contains("Geb")
     }
-    
+
     static content = {
         // Navigation elements - using flexible selectors since nav element may not exist
         navigation { $("header, .menu, .navigation") }
         navigationLinks { $("header a, .menu a, .navigation a, a") }
         manualLink { $("a", text: "Manual") }
-        
-        // Main content areas  
-        mainContent { $("main") }
+        manualsMenu { $(id: 'manuals-menu') }
+
+        // Main content areas
         contentArea { $(".content") }
-        
+
         // Footer
         footer { $("footer, .footer") }
     }
-    
+
     /**
      * Navigate to the manual page
      * @return ManualPage instance
      */
-    ManualPage goToManual() {
+    ManualPage goToManual(String version = "") {
         manualLink.click()
-        browser.page(ManualPage)
+        def versionLinks = manualsMenu.children('.ui.container').children('.item')
+        def versionLink = version ? versionLinks.find { (it.text() - 'current\n') == version } : versionLinks.first()
+        versionLink.click()
+        browser.at(ManualPage)
     }
-    
+
     /**
      * Check if navigation is properly displayed
      * @return boolean
@@ -44,46 +47,22 @@ class HomePage extends Page {
     boolean hasNavigation() {
         navigation.size() > 0 && navigationLinks.size() > 0
     }
-    
+
     /**
      * Check if main content is displayed
-     * @return boolean  
-     */
-    boolean hasMainContent() {
-        mainContent.size() > 0 || contentArea.size() > 0
-    }
-    
-    /**
-     * TDD Example: Search functionality (implement after writing tests)
-     */
-    def searchBox = { $("input[type='search'], .search input") }
-    def searchResults = { $(".search-results, #search-results") }
-    
-    /**
-     * Perform a search operation
-     * @param query The search term
-     */
-    void performSearch(String query) {
-        if (searchBox.displayed) {
-            searchBox.value(query)
-            searchBox << "\n"
-        }
-    }
-    
-    /**
-     * Check if search results are displayed
      * @return boolean
      */
-    boolean hasSearchResults() {
-        searchResults.displayed
+    boolean hasMainContent() {
+        contentArea.size() > 0
     }
-    
+
+
     /**
      * TDD Example: Check if page is fully loaded
      * @return boolean
      */
     boolean isFullyLoaded() {
         // Implementation after TDD cycle
-        navigation.size() > 0 && (mainContent.size() > 0 || contentArea.size() > 0)
+        navigation.size() > 0 && (contentArea.size() > 0)
     }
 }

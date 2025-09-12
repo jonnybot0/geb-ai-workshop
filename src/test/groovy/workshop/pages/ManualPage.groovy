@@ -8,7 +8,7 @@ import geb.Page
 class ManualPage extends Page {
 
     static at = {
-        title.contains("The Book of Geb")
+        title.contains("The Book Of Geb")
     }
 
     static content = {
@@ -16,6 +16,7 @@ class ManualPage extends Page {
         mainContent { $("main") }
         contentDiv { $(".content") }
         bodyElement { $("body") }
+        versionNumber { $(id: 'revnumber') }
     }
 
     /**
