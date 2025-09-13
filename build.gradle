@@ -8,29 +8,29 @@ repositories {
 }
 
 ext {
-    gebVersion = '7.0'
-    seleniumVersion = '4.15.0'
+    gebVersion = '8.0.0'
+    seleniumVersion = '4.27.0'
     spockVersion = '2.3-groovy-4.0'
-    groovyVersion = '4.0.15'
+    groovyVersion = '4.0.28'
 }
 
 dependencies {
     testImplementation "org.apache.groovy:groovy:$groovyVersion"
-    testImplementation "org.gebish:geb-spock:$gebVersion"
+    testImplementation "org.apache.groovy.geb:geb-spock:$gebVersion"
     testImplementation "org.spockframework:spock-core:$spockVersion"
-    
+
     // JUnit Platform for Spock
     testImplementation platform("org.spockframework:spock-bom:$spockVersion")
     testRuntimeOnly "org.junit.platform:junit-platform-launcher"
-    
+
     testImplementation "org.seleniumhq.selenium:selenium-chrome-driver:$seleniumVersion"
     testImplementation "org.seleniumhq.selenium:selenium-firefox-driver:$seleniumVersion"
     testImplementation "org.seleniumhq.selenium:selenium-remote-driver:$seleniumVersion"
     testImplementation "org.seleniumhq.selenium:selenium-support:$seleniumVersion"
-    
+
     // For Selenium Grid
     testImplementation "org.seleniumhq.selenium:selenium-grid:$seleniumVersion"
-    
+
     // WebDriver management
     testImplementation 'io.github.bonigarcia:webdrivermanager:5.5.3'
 }
@@ -39,10 +39,10 @@ test {
     useJUnitPlatform()
     systemProperties System.properties
     maxParallelForks = Runtime.runtime.availableProcessors()
-    
+
     // Enable parallel execution
     systemProperty 'geb.parallel', 'true'
-    
+
     testLogging {
         events "passed", "skipped", "failed"
         exceptionFormat "full"
