@@ -1,6 +1,7 @@
 package workshop.pages
 
 import geb.Page
+import workshop.modules.ManualsMenuModule
 
 /**
  * Page object for the Geb homepage
@@ -19,7 +20,7 @@ class HomePage extends Page {
         navigation { $("header, .menu, .navigation") }
         navigationLinks { $("header a, .menu a, .navigation a, a") }
         manualLink { $("a", text: "Manual") }
-        manualsMenu { $(id: 'manuals-menu') }
+        manualsMenu { $(id: 'manuals-menu').module(ManualsMenuModule) }
 
         // Main content areas
         contentArea { $(".content") }
@@ -34,9 +35,7 @@ class HomePage extends Page {
      */
     ManualPage goToManual(String version = "") {
         manualLink.click()
-        def versionLinks = manualsMenu.children('.ui.container').children('.item')
-        def versionLink = version ? versionLinks.find { (it.text() - 'current\n') == version } : versionLinks.first()
-        versionLink.click()
+        manualsMenu.clickVersion(version)
         browser.at(ManualPage)
     }
 
