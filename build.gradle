@@ -46,9 +46,6 @@ test {
     systemProperties System.properties
     maxParallelForks = Runtime.runtime.availableProcessors()
 
-    // Enable parallel execution
-    systemProperty 'geb.parallel', 'true'
-
     testLogging {
         events "passed", "skipped", "failed"
         exceptionFormat "full"
@@ -59,7 +56,6 @@ test {
 task parallelTest(type: Test) {
     useJUnitPlatform()
     maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
-    systemProperty 'geb.parallel', 'true'
     systemProperty 'webdriver.chrome.driver', System.getProperty('webdriver.chrome.driver')
     systemProperty 'webdriver.gecko.driver', System.getProperty('webdriver.gecko.driver')
 }
