@@ -1,64 +1,46 @@
 package workshop
 
-import geb.spock.GebSpec
+import geb.spock.GebReportingSpec
+import spock.lang.Shared
+import workshop.pages.GebHomePage
 
 /**
- * These are "rough" tests that work but lack organization.
- * In the workshop, we'll transform these into organized page objects.
+ * Clean tests using page objects and following Geb best practices
  */
-class RoughTestsSpec extends GebSpec {
+class RoughTestsSpec extends GebReportingSpec {
+
+    @Shared
+    GebHomePage gebHomePage
+
+    def setup() {
+        gebHomePage = to GebHomePage
+    }
 
     def "navigate to Geb homepage and verify title"() {
-        when: "I go to the Geb homepage"
-        go "https://groovy.apache.org/geb/"
-
-        then: "I should see the correct title"
-        title.contains("Geb")
+        expect: "I should see the correct title"
+        gebHomePage.hasCorrectTitle()
     }
 
     def "check navigation menu exists"() {
-        when: "I go to the Geb homepage"
-        go "https://groovy.apache.org/geb/"
-
-        then: "I should see navigation elements"
-        // Updated to check for more flexible navigation patterns since nav element may not exist
-        $("header a, .menu a, .navigation a, a").size() > 0
+        expect: "I should see navigation elements"
+        gebHomePage.hasNavigation()
     }
 
     def "navigate to manual page"() {
-        when: "I go to the Geb homepage"
-        go "https://groovy.apache.org/geb/"
+        when: "I navigate to the manual"
+        def manualPage = gebHomePage.navigateToManual()
 
-        and: "I click the manual link"
-        def manualLink = $(".manuals", text: "Manual")
-        manualLink.click()
-
-        then: "drop-down with manual links appears"
-        def manualLinks = $('#manuals-menu .ui.container')
-        manualLinks.children('.item').size() > 2
-
-        when:
-        manualLinks.children('.item').first().click()
-
-        then:
-        waitFor {
-            title.contains("The Book Of Geb")
-        }
+        then: "I should be on the manual page"
+        manualPage.isManualPage()
     }
 
     def "check main content area exists"() {
-        when: "I go to the Geb homepage"
-        go "https://groovy.apache.org/geb/"
-
-        then: "I should see main content"
-        $("body").displayed
+        expect: "I should see main content"
+        gebHomePage.hasMainContent()
     }
 
     def "verify footer exists"() {
-        when: "I go to the Geb homepage"
-        go "https://groovy.apache.org/geb/"
-
-        then: "I should see a footer"
-        $("footer").displayed || $(".footer").displayed
+        expect: "I should see a footer"
+        gebHomePage.hasFooter()
     }
 }
