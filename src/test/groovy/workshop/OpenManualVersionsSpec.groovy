@@ -11,7 +11,7 @@ import workshop.pages.ManualPage
  */
 class OpenManualVersionsSpec extends GebSpec {
 
-    @Unroll("Test parallel execution #version")
+    @Unroll("Test parallel executions #version")
     def "demonstrate parallel execution capabilities"() {
         when: "I navigate to the homepage"
         def homePage = to HomePage

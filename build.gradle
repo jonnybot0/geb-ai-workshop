@@ -44,7 +44,7 @@ java {
 test {
     useJUnitPlatform()
     systemProperties System.properties
-    maxParallelForks = Runtime.runtime.availableProcessors() - 1
+    maxParallelForks = 2
 
     testLogging {
         events "passed", "skipped", "failed"
