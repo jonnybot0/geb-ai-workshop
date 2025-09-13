@@ -45,6 +45,7 @@ test {
     useJUnitPlatform()
     systemProperties System.properties
     maxParallelForks = 2
+    systemProperty 'geb.env', 'firefox'
 
     testLogging {
         events "passed", "skipped", "failed"
