@@ -44,7 +44,7 @@ java {
 test {
     useJUnitPlatform()
     systemProperties System.properties
-    maxParallelForks = Runtime.runtime.availableProcessors()
+    maxParallelForks = Runtime.runtime.availableProcessors() - 1
 
     testLogging {
         events "passed", "skipped", "failed"
@@ -53,13 +53,13 @@ test {
 }
 
 // Task for running tests in parallel
-task parallelTest(type: Test) {
+tasks.register('nonParallelTests', Test) {
     useJUnitPlatform()
-    maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
+    maxParallelForks = 1
 }
 
 // Task for running tests against Selenium Grid
-task gridTest(type: Test) {
+tasks.register('gridTest', Test) {
     useJUnitPlatform()
     systemProperty 'geb.env', 'grid'
     systemProperty 'selenium.grid.url', System.getProperty('selenium.grid.url', 'http://localhost:4444')
