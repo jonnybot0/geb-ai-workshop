@@ -42,10 +42,6 @@ class GebHomePage extends Page {
 
         manualMenu.children('.item').first().click()
 
-        waitFor {
-            at GebManualPage
-        }
-
-        browser.page(GebManualPage)
+        browser.at GebManualPage
     }
 }
