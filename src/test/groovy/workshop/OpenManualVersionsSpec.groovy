@@ -9,7 +9,7 @@ import workshop.pages.ManualPage
  * Demonstrates parallel test execution with Geb
  * These tests are designed to run in parallel to showcase performance benefits
  */
-class ParallelTestsSpec extends GebSpec {
+class OpenManualVersionsSpec extends GebSpec {
 
     @Unroll("Test parallel execution #version")
     def "demonstrate parallel execution capabilities"() {

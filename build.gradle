@@ -56,8 +56,6 @@ test {
 task parallelTest(type: Test) {
     useJUnitPlatform()
     maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
-    systemProperty 'webdriver.chrome.driver', System.getProperty('webdriver.chrome.driver')
-    systemProperty 'webdriver.gecko.driver', System.getProperty('webdriver.gecko.driver')
 }
 
 // Task for running tests against Selenium Grid
