@@ -35,6 +35,12 @@ dependencies {
     testImplementation 'io.github.bonigarcia:webdrivermanager:5.5.3'
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
 test {
     useJUnitPlatform()
     systemProperties System.properties
